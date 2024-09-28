@@ -6,18 +6,21 @@ import Link from "next/link";
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1); 
+  const [totalPages, setTotalPages] = useState(1); 
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get("/api/orders");
-        setOrders(response.data);
+        const response = await axios.get(`/api/orders?page=${page}`); // 
+        setOrders(response.data.orders);
+        setTotalPages(response.data.total_pages); 
       } catch (error) {
         console.error("Error fetching orders:", error);
       }
     };
     fetchOrders();
-  }, []);
+  }, [page]);
 
   const filteredOrders = orders.filter((order) => {
     return (
@@ -98,6 +101,24 @@ export default function OrdersPage() {
             ))}
           </tbody>
         </table>
+      </div>
+
+      <div className="flex justify-between mt-4">
+        <button
+          className="bg-gray-300 text-black py-2 px-4 rounded"
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+        >
+          Previous
+        </button>
+        <span className="self-center">Page {page} of {totalPages}</span>
+        <button
+          className="bg-gray-300 text-black py-2 px-4 rounded"
+          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+          disabled={page === totalPages}
+        >
+          Next
+        </button>
       </div>
     </div>
   );
