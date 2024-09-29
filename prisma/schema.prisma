@@ -1,0 +1,89 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Order {
+  id                Int      @id @default(autoincrement())
+  channelId         Int?     // Optional integer
+  channelName       String?  // Optional string
+  baseChannelCode   String?  // Optional string
+  channelOrderId    String   @unique
+  customerName      String?  // Optional string
+  customerEmail     String?  // Optional string
+  customerPhone     String?  // Optional string
+  pickupLocation    String?  // Optional string
+  paymentStatus     String?  // Optional string
+  total             Float?   // Optional float
+  tax               Float?   // Optional float
+  sla               String?  // Optional string
+  shippingMethod    String?  // Optional string
+  expedited         Boolean? // Optional boolean
+  status            String?  // Optional string
+  statusCode        Int?     // Optional integer
+  paymentMethod     String?  // Optional string
+  isInternational   Boolean? // Optional boolean
+  purposeOfShipment Int?     // Optional integer
+  channelCreatedAt  DateTime?// Optional datetime
+  createdAt         DateTime?// Optional datetime
+  allowReturn       Boolean? // Optional boolean
+  isIncomplete      Boolean? // Optional boolean
+  // products          Product[]
+  // shipments         Shipment[]
+  // activities        Activity[]
+}
+
+// model Product {
+//   id                    Int      @id @default(autoincrement())
+//   channelOrderProductId  String? // Optional string
+//   name                  String?  // Optional string
+//   channelSku            String?  // Optional string
+//   quantity              Int?     // Optional integer
+//   productId             Int?     // Optional integer
+//   available             Int?     // Optional integer
+//   status                String?  // Optional string
+//   hsn                   String?  // Optional string
+//   orderId               Int?     // Optional integer
+//   order                 Order?   @relation(fields: [orderId], references: [id])
+// }
+
+// model Shipment {
+//   id                   Int      @id @default(autoincrement())
+//   isdCode              String?  // Optional string
+//   courier              String?  // Optional string
+//   weight               Float?   // Optional float
+//   dimensions           String?  // Optional string
+//   pickupScheduledDate  DateTime?// Optional datetime
+//   pickupTokenNumber    String?  // Optional string
+//   awb                  String?  // Optional string
+//   returnAwb            String?  // Optional string
+//   volumetricWeight     Float?   // Optional float
+//   pod                  String?  // Optional string
+//   etd                  String?  // Optional string
+//   rtoDeliveredDate     DateTime?// Optional datetime
+//   deliveredDate        DateTime?// Optional datetime
+//   etdEscalationBtn     Boolean? // Optional boolean
+//   orderId              Int?     // Optional integer
+//   order                Order?   @relation(fields: [orderId], references: [id])
+// }
+
+// model Activity {
+//   id        Int      @id @default(autoincrement())
+//   action    String?  // Optional string
+//   orderId   Int?     // Optional integer
+//   order     Order?   @relation(fields: [orderId], references: [id])
+// }
+
+
+
