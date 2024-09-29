@@ -22,28 +22,42 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  const filteredOrders = orders.filter((order) => {
+  const emailSet = new Set();
+  const phoneSet = new Set();
+
+  const flaggedOrders = orders.map((order) => {
+    const isDuplicate =
+      emailSet.has(order.customerEmail) && phoneSet.has(order.customerPhone);
+
+    emailSet.add(order.customerEmail);
+    phoneSet.add(order.customerPhone);
+
+    return { ...order, flag: isDuplicate ? "flag Yes" : "flag No" };
+  });
+
+  const filteredOrders = flaggedOrders.filter((order) => {
     return (
-      order.customerName.toLowerCase().includes(searchQuery)||
+      order.customerName.toLowerCase().includes(searchQuery) ||
       order.channelOrderId.toLowerCase().includes(searchQuery) ||
       order.customerEmail.toLowerCase().includes(searchQuery) ||
       order.customerPhone.toLowerCase().includes(searchQuery) ||
       order.customerPincode.toLowerCase().includes(searchQuery) ||
       order.customerCity.toLowerCase().includes(searchQuery) ||
+      order.flag.toLowerCase().includes(searchQuery) ||
       order.customerState.toLowerCase().includes(searchQuery)
     );
   });
 
-  // Fetch new data and save to Prisma
+  
   const handleFetchData = async () => {
     setFetchingData(true);
     try {
       const response = await fetch(`/api/fetchsave`, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({}), 
+        body: JSON.stringify({}),
       });
       const result = await response.json();
       if (response.ok) {
@@ -57,14 +71,13 @@ export default function OrdersPage() {
     setFetchingData(false);
   };
 
-  // Update missing data from API to Prisma
   const handleUpdateData = async () => {
     setUpdatingData(true);
     try {
       const response = await fetch(`/api/updateOrders`, {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
       const result = await response.json();
@@ -90,7 +103,6 @@ export default function OrdersPage() {
         </button>
       </Link>
 
-      {/* Search Input */}
       <input
         type="text"
         placeholder="Search by Name, Order ID, Email, Phone, Pincode, City, or State..."
@@ -133,6 +145,7 @@ export default function OrdersPage() {
               <th className="px-4 py-2">State</th>
               <th className="px-4 py-2">Pincode</th>
               <th className="px-4 py-2">Country</th>
+              <th className="px-4 py-2">Flag (Duplicate)</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
@@ -149,6 +162,7 @@ export default function OrdersPage() {
                 <td className="px-3 py-2 text-center">{order.customerState}</td>
                 <td className="px-3 py-2 text-center">{order.customerPincode}</td>
                 <td className="px-3 py-2 text-center">{order.customerCountry}</td>
+                <td className="px-3 py-2 text-center">{order.flag}</td>
               </tr>
             ))}
           </tbody>
