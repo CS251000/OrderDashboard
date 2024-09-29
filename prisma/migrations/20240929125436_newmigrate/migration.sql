@@ -1,6 +1,7 @@
 -- CreateTable
 CREATE TABLE "Order" (
-    "id" SERIAL NOT NULL,
+    "sno" SERIAL NOT NULL,
+    "id" INTEGER NOT NULL,
     "channelId" INTEGER,
     "channelName" TEXT,
     "baseChannelCode" TEXT,
@@ -8,6 +9,12 @@ CREATE TABLE "Order" (
     "customerName" TEXT,
     "customerEmail" TEXT,
     "customerPhone" TEXT,
+    "customerAddress" TEXT,
+    "customerAddress2" TEXT,
+    "customerCity" TEXT,
+    "customerState" TEXT,
+    "customerPincode" TEXT,
+    "customerCountry" TEXT,
     "pickupLocation" TEXT,
     "paymentStatus" TEXT,
     "total" DOUBLE PRECISION,

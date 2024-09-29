@@ -15,7 +15,8 @@ datasource db {
 
 
 model Order {
-  id                Int      @id @default(autoincrement())
+  sno               Int       @default(autoincrement())
+  id                Int       @id
   channelId         Int?     // Optional integer
   channelName       String?  // Optional string
   baseChannelCode   String?  // Optional string
@@ -23,6 +24,12 @@ model Order {
   customerName      String?  // Optional string
   customerEmail     String?  // Optional string
   customerPhone     String?  // Optional string
+  customerAddress   String?
+  customerAddress2  String?
+  customerCity      String?
+  customerState     String?
+  customerPincode   String?
+  customerCountry   String?
   pickupLocation    String?  // Optional string
   paymentStatus     String?  // Optional string
   total             Float?   // Optional float
