@@ -48,7 +48,6 @@ export default function OrdersPage() {
     );
   });
 
-  
   const handleFetchData = async () => {
     setFetchingData(true);
     try {
@@ -145,24 +144,38 @@ export default function OrdersPage() {
               <th className="px-4 py-2">State</th>
               <th className="px-4 py-2">Pincode</th>
               <th className="px-4 py-2">Country</th>
-              <th className="px-4 py-2">Flag (Duplicate)</th>
+              <th className="px-4 py-2">Flag(Match?)</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
             {filteredOrders.map((order) => (
               <tr key={order.channelOrderId} className="border-t">
-                <td className="px-3 py-2 text-center">{order.channelOrderId}</td>
+                <td className="px-3 py-2 text-center">
+                  {order.channelOrderId}
+                </td>
                 <td className="px-3 py-2 text-center">{order.customerName}</td>
                 <td className="px-3 py-2 text-center">{order.customerEmail}</td>
                 <td className="px-3 py-2 text-center">{order.createdAt}</td>
                 <td className="px-3 py-2 text-center">{order.customerPhone}</td>
-                <td className="px-3 py-2 text-center">{order.customerAddress}</td>
-                <td className="px-3 py-2 text-center">{order.customerAddress2}</td>
+                <td className="px-3 py-2 text-center">
+                  {order.customerAddress}
+                </td>
+                <td className="px-3 py-2 text-center">
+                  {order.customerAddress2}
+                </td>
                 <td className="px-3 py-2 text-center">{order.customerCity}</td>
                 <td className="px-3 py-2 text-center">{order.customerState}</td>
-                <td className="px-3 py-2 text-center">{order.customerPincode}</td>
-                <td className="px-3 py-2 text-center">{order.customerCountry}</td>
-                <td className="px-3 py-2 text-center">{order.flag}</td>
+                <td className="px-3 py-2 text-center">
+                  {order.customerPincode}
+                </td>
+                <td className="px-3 py-2 text-center">
+                  {order.customerCountry}
+                </td>
+                <td
+                  className={`px-3 py-2 text-center text-black ${!order.flag ? "bg-green-300" : "bg-red-300"}`}
+                >
+                  {order.flag}
+                </td>
               </tr>
             ))}
           </tbody>
