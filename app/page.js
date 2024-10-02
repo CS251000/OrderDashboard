@@ -2,14 +2,16 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import Link from "next/link";
+import FilterModal from "@/components/FilterModal";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [fetchingData, setFetchingData] = useState(false);
   const [updatingData, setUpdatingData] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); 
+  const [filters, setFilters] = useState({ paymentMethod: "", flag: "", courierPartner: "" }); 
 
-  // Fetch orders from the database
   useEffect(() => {
     const fetchOrders = async () => {
       try {
@@ -24,27 +26,32 @@ export default function OrdersPage() {
 
   const emailSet = new Set();
   const phoneSet = new Set();
+  const addressSet = new Set();
 
   const flaggedOrders = orders.map((order) => {
     const isDuplicate =
-      emailSet.has(order.customerEmail) && phoneSet.has(order.customerPhone);
+      emailSet.has(order.customerEmail) &&
+      phoneSet.has(order.customerPhone) ||
+      addressSet.has(order.customerAddress);
 
     emailSet.add(order.customerEmail);
     phoneSet.add(order.customerPhone);
+    addressSet.add(order.customerAddress);
 
-    return { ...order, flag: isDuplicate ? "flag Yes" : "flag No" };
+    return { ...order, flag: isDuplicate ? "Repeat" : "New" };
   });
 
   const filteredOrders = flaggedOrders.filter((order) => {
+    const matchesFilters =
+      (filters.paymentMethod ? order.paymentMethod.includes(filters.paymentMethod) : true) &&
+      (filters.flag ? order.flag.includes(filters.flag) : true) &&
+      (filters.courierPartner ? order.shipments && order.shipments[0]?.courier.includes(filters.courierPartner) : true);
+
     return (
-      order.customerName.toLowerCase().includes(searchQuery) ||
-      order.channelOrderId.toLowerCase().includes(searchQuery) ||
-      order.customerEmail.toLowerCase().includes(searchQuery) ||
+      matchesFilters &&
+      (order.customerEmail.toLowerCase().includes(searchQuery) ||
       order.customerPhone.toLowerCase().includes(searchQuery) ||
-      order.customerPincode.toLowerCase().includes(searchQuery) ||
-      order.customerCity.toLowerCase().includes(searchQuery) ||
-      order.flag.toLowerCase().includes(searchQuery) ||
-      order.customerState.toLowerCase().includes(searchQuery)
+      order.customerPincode.toLowerCase().includes(searchQuery))
     );
   });
 
@@ -91,6 +98,10 @@ export default function OrdersPage() {
     setUpdatingData(false);
   };
 
+  const handleApplyFilters = (appliedFilters) => {
+    setFilters(appliedFilters);
+  };
+
   return (
     <div className="min-h-screen bg-white text-black p-4">
       <h1 className="text-2xl font-bold mb-4 text-center">Order Dashboard</h1>
@@ -104,7 +115,7 @@ export default function OrdersPage() {
 
       <input
         type="text"
-        placeholder="Search by Name, Order ID, Email, Phone, Pincode, City, or State..."
+        placeholder="Search by Email, Phone, Pincode..."
         className="w-full mb-4 p-2 border border-gray-900 rounded"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
@@ -128,52 +139,61 @@ export default function OrdersPage() {
         </button>
       </div>
 
-      {/* Orders Table */}
+      {/* Filter Modal Button */}
+      <div className="mb-4">
+        <button
+          className="bg-gray-500 text-white py-2 px-4 rounded"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
+          Open Filters
+        </button>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="table-auto w-full bg-white border border-gray-300">
           <thead className="bg-gray-200">
             <tr>
-              <th className="px-4 py-2">Order ID</th>
+              <th className="px-4 py-2">Channel Order ID</th>
               <th className="px-4 py-2">Customer Name</th>
               <th className="px-4 py-2">Customer Email</th>
-              <th className="px-4 py-2">Created At</th>
               <th className="px-4 py-2">Phone</th>
+              <th className="px-4 py-2">Payment Method</th>
+              <th className="px-4 py-2">Created At</th>
+              <th className="px-4 py-2">ETD</th>
+              <th className="px-4 py-2">Delivered Date</th>
+              <th className="px-4 py-2">Courier Partner Name</th>
               <th className="px-4 py-2">Address Line 1</th>
               <th className="px-4 py-2">Address Line 2</th>
               <th className="px-4 py-2">City</th>
               <th className="px-4 py-2">State</th>
               <th className="px-4 py-2">Pincode</th>
-              <th className="px-4 py-2">Country</th>
-              <th className="px-4 py-2">Flag(Match?)</th>
+              <th className="px-4 py-2">Flag(Repeat/New?)</th>
             </tr>
           </thead>
           <tbody id="ordersTableBody">
             {filteredOrders.map((order) => (
               <tr key={order.channelOrderId} className="border-t">
-                <td className="px-3 py-2 text-center">
-                  {order.channelOrderId}
-                </td>
+                <td className="px-3 py-2 text-center">{order.channelOrderId}</td>
                 <td className="px-3 py-2 text-center">{order.customerName}</td>
                 <td className="px-3 py-2 text-center">{order.customerEmail}</td>
-                <td className="px-3 py-2 text-center">{order.createdAt}</td>
                 <td className="px-3 py-2 text-center">{order.customerPhone}</td>
+                <td className="px-3 py-2 text-center">{order.paymentMethod}</td>
+                <td className="px-3 py-2 text-center">{order.createdAt}</td>
                 <td className="px-3 py-2 text-center">
-                  {order.customerAddress}
+                  {order.shipments && order.shipments.length > 0 ? order.shipments[0].etd : "No ETD "}
                 </td>
                 <td className="px-3 py-2 text-center">
-                  {order.customerAddress2}
+                  {order.shipments && order.shipments.length > 0 ? order.shipments[0].deliveredDate : "No Delivered Date "}
                 </td>
+                <td className="px-3 py-2 text-center">
+                  {order.shipments && order.shipments.length > 0 ? order.shipments[0].courier : "No Courier "}
+                </td>
+                <td className="px-3 py-2 text-center">{order.customerAddress}</td>
+                <td className="px-3 py-2 text-center">{order.customerAddress2}</td>
                 <td className="px-3 py-2 text-center">{order.customerCity}</td>
                 <td className="px-3 py-2 text-center">{order.customerState}</td>
-                <td className="px-3 py-2 text-center">
-                  {order.customerPincode}
-                </td>
-                <td className="px-3 py-2 text-center">
-                  {order.customerCountry}
-                </td>
-                <td
-                  className={`px-3 py-2 text-center text-black ${!order.flag ? "bg-green-300" : "bg-red-300"}`}
-                >
+                <td className="px-3 py-2 text-center">{order.customerPincode}</td>
+                <td className={`px-3 py-2 text-center text-black ${order.flag == "Repeat" ? "bg-green-300" : "bg-red-300"}`}>
                   {order.flag}
                 </td>
               </tr>
@@ -181,6 +201,15 @@ export default function OrdersPage() {
           </tbody>
         </table>
       </div>
+
+      {isFilterModalOpen && (
+        <FilterModal
+          isOpen={isFilterModalOpen}
+          onClose={() => setIsFilterModalOpen(false)}
+          onApply={handleApplyFilters}
+          filters={filters}
+        />
+      )}
     </div>
   );
 }

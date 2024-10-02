@@ -4,7 +4,11 @@ const prisma = new PrismaClient();
 
 export async function GET(request) {
   try {
-    const orders = await prisma.order.findMany(); 
+    const orders = await prisma.order.findMany({
+      orderBy:[{
+        createdAt:'desc',
+      }]
+    }); 
 
     return new Response(
       JSON.stringify({ orders }),
