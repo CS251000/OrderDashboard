@@ -9,7 +9,7 @@ export async function POST(req) {
     let currentPage = 1;
 
     while (currentPage <= 1) {
-      const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders?page=1`, {
+      const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders?page=99&per_page=10`, {
         headers: {
           'Authorization': `Bearer ${process.env.SHIPROCKET_API_TOKEN}`,
           'Content-Type': 'application/json',
@@ -79,8 +79,7 @@ export async function POST(req) {
                 etdEscalationBtn: shipment.etd_escalation_btn === 1
               })) : [],
             },
-            
-            // Handle products array
+
             products: {
               create: Array.isArray(order.products) ? order.products.map((product) => ({
                 id: product.id,
@@ -95,7 +94,7 @@ export async function POST(req) {
               })) : [],
             },
             
-            // Handle activities array
+
             activities: {
               create: Array.isArray(order.activities) ? order.activities.map((activity) => ({
                 action: activity.action || ''
@@ -118,7 +117,7 @@ export async function POST(req) {
     return new Response(JSON.stringify({
       message: 'Error saving data',
       error: error.message,
-      stack: error.stack, // Add stack trace for debugging
+      stack: error.stack,
       details: error.response?.data || null
     }), {
       status: 500,
@@ -127,7 +126,6 @@ export async function POST(req) {
   }
 }
 
-// Helper function to check if a date is valid
 function isValidDate(date) {
   return date && !isNaN(new Date(date).getTime());
 }

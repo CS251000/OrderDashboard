@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req) {
   try {
-    const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders`, {
+    const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders?page=1`, {
       headers: {
         'Authorization': `Bearer ${process.env.SHIPROCKET_API_TOKEN}`,
         'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ export async function POST(req) {
       if (!existingOrder) {
         await prisma.order.create({
           data: {
-            id : order.id,
+            id: parseInt(order.channel_order_id),
             channelId: order.channel_id || null,
             channelName: order.channel_name || null,
             baseChannelCode: order.base_channel_code || '',
@@ -46,16 +46,62 @@ export async function POST(req) {
             tax: parseFloat(order.tax) || 0,
             sla: order.sla || '',
             shippingMethod: order.shipping_method || '',
-            expedited: order.expedited === 1,  // Convert to boolean
+            expedited: order.expedited === 1,
             status: order.status || '',
             statusCode: order.status_code || 0,
             paymentMethod: order.payment_method || '',
             isInternational: order.is_international === 1,
             purposeOfShipment: order.purpose_of_shipment || 0,
-            channelCreatedAt: new Date(order.channel_created_at) || null,
-            createdAt: new Date(order.created_at) || null,
+            channelCreatedAt: order.channel_created_at ? new Date(order.channel_created_at) : null,
+            createdAt: order.created_at ? new Date(order.created_at) : null,
             allowReturn: order.allow_return === 1,
             isIncomplete: order.is_incomplete === 1,
+            errors: Array.isArray(order.errors) ? order.errors : [],
+            showEscalationBtn: order.show_escalation_btn === 1,
+            escalationStatus: order.escalation_status || null,
+            escalationHistory: Array.isArray(order.escalation_history) ? order.escalation_history : [],
+         
+            shipments: {
+              create: Array.isArray(order.shipments) ? order.shipments.map((shipment) => ({
+                id: shipment.id,
+                isdCode: shipment.isd_code || '',
+                courier: shipment.courier || '',
+                weight: parseFloat(shipment.weight) || 0,
+                dimensions: shipment.dimensions || '',
+                pickupScheduledDate: isValidDate(shipment.pickup_scheduled_date) ? new Date(shipment.pickup_scheduled_date) : null,
+                pickupTokenNumber: shipment.pickup_token_number || '',
+                awb: shipment.awb || '',
+                returnAwb: shipment.return_awb || '',
+                volumetricWeight: parseFloat(shipment.volumetric_weight) || 0,
+                pod: shipment.pod || '',
+                etd: shipment.etd || '',
+                rtoDeliveredDate: isValidDate(shipment.rto_delivered_date) ? new Date(shipment.rto_delivered_date) : null,
+                deliveredDate: isValidDate(shipment.delivered_date) ? new Date(shipment.delivered_date) : null,
+                etdEscalationBtn: shipment.etd_escalation_btn === 1
+              })) : [],
+            },
+            
+            // Handle products array
+            products: {
+              create: Array.isArray(order.products) ? order.products.map((product) => ({
+                id: product.id,
+                channelOrderProductId: product.channel_order_product_id || '',
+                name: product.name || '',
+                channelSku: product.channel_sku || '',
+                quantity: product.quantity || 0,
+                productId: product.product_id || 0,
+                available: product.available || 0,
+                status: product.status || '',
+                hsn: product.hsn || ''
+              })) : [],
+            },
+            
+            // Handle activities array
+            activities: {
+              create: Array.isArray(order.activities) ? order.activities.map((activity) => ({
+                action: activity.action || ''
+              })) : [],
+            },
           },
         });
       }

@@ -135,7 +135,7 @@ export default function OrdersPage() {
           onClick={handleUpdateData}
           disabled={updatingData}
         >
-          {updatingData ? "Updating Data..." : "Update Missing Data"}
+          {updatingData ? "Refreshing Data..." : "Refresh Data"}
         </button>
       </div>
 
