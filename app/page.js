@@ -28,6 +28,17 @@ export default function OrdersPage() {
   const phoneSet = new Set();
   const addressSet = new Set();
 
+  const calculateTimeTaken = (createdAt, deliveredDate) => {
+    if (createdAt && deliveredDate) {
+      const created = new Date(createdAt);
+      const delivered = new Date(deliveredDate);
+      const diffTime = Math.abs(delivered - created);
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return `${diffDays} days`;
+    }
+    return "N/A";
+  };
+
   const flaggedOrders = orders.map((order) => {
     const isDuplicate =
       emailSet.has(order.customerEmail) &&
@@ -106,7 +117,6 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-white text-black p-4">
       <h1 className="text-2xl font-bold mb-4 text-center">Order Dashboard</h1>
 
-      {/* Manifest Button */}
       <Link href={"/manifest"}>
         <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">
           Manifest
@@ -121,7 +131,6 @@ export default function OrdersPage() {
         onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
       />
 
-      {/* Fetch Data Button */}
       <div className="mb-4">
         <button
           className={`bg-green-500 text-white py-2 px-4 rounded ${fetchingData ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -132,15 +141,11 @@ export default function OrdersPage() {
         </button>
         <button
           className={`bg-yellow-500 text-white py-2 px-4 mx-4 rounded ${updatingData ? "opacity-50 cursor-not-allowed" : ""}`}
-          onClick={handleUpdateData}
+          // onClick={handleUpdateData}
           disabled={updatingData}
         >
           {updatingData ? "Refreshing Data..." : "Refresh Data"}
         </button>
-      </div>
-
-      {/* Filter Modal Button */}
-      <div className="mb-4">
         <button
           className="bg-gray-500 text-white py-2 px-4 rounded"
           onClick={() => setIsFilterModalOpen(true)}
@@ -148,6 +153,7 @@ export default function OrdersPage() {
           Open Filters
         </button>
       </div>
+
 
       <div className="overflow-x-auto">
         <table className="table-auto w-full bg-white border border-gray-300">
@@ -161,6 +167,7 @@ export default function OrdersPage() {
               <th className="px-4 py-2">Created At</th>
               <th className="px-4 py-2">ETD</th>
               <th className="px-4 py-2">Delivered Date</th>
+              <th className="px-4 py-2">Time Taken</th>
               <th className="px-4 py-2">Courier Partner Name</th>
               <th className="px-4 py-2">Address Line 1</th>
               <th className="px-4 py-2">Address Line 2</th>
@@ -184,6 +191,9 @@ export default function OrdersPage() {
                 </td>
                 <td className="px-3 py-2 text-center">
                   {order.shipments && order.shipments.length > 0 ? order.shipments[0].deliveredDate : "No Delivered Date "}
+                </td>
+                <td className="px-3 py-2 text-center">
+                  {calculateTimeTaken(order.createdAt, order.shipments && order.shipments[0]?.deliveredDate)}
                 </td>
                 <td className="px-3 py-2 text-center">
                   {order.shipments && order.shipments.length > 0 ? order.shipments[0].courier : "No Courier "}
