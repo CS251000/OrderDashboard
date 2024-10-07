@@ -40,7 +40,7 @@ export async function POST(request) {
     }
 
     const existingShipment = await prisma.shipment.findFirst({
-      where: { awb },
+      where: {awb},
     });
 
     if (existingShipment) {
@@ -90,6 +90,6 @@ export async function POST(request) {
     return new Response(JSON.stringify({ error: 'Failed to process webhook and update database', details: error.message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
-    });
+    });a
   }
 }
