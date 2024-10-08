@@ -1,19 +1,30 @@
-"use client"
-import { useState } from "react";
-const FilterModal = ({ isOpen, onClose, onApply }) => {
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [flag, setFlag] = useState('');
-  const [courierPartner, setCourierPartner] = useState('');
+"use client";
+import { useState, useEffect } from "react";
+
+const FilterModal = ({ isOpen, onClose, onApply, filters }) => {
+  const [paymentMethod, setPaymentMethod] = useState(filters.paymentMethod || '');
+  const [flag, setFlag] = useState(filters.flag || '');
+  const [courierPartner, setCourierPartner] = useState(filters.courierPartner || '');
+
+  // Update state when filters change (useful when modal is reopened)
+  useEffect(() => {
+    if (isOpen) {
+      setPaymentMethod(filters.paymentMethod || '');
+      setFlag(filters.flag || '');
+      setCourierPartner(filters.courierPartner || '');
+    }
+  }, [isOpen, filters]);
 
   const handleApply = () => {
     onApply({ paymentMethod, flag, courierPartner });
     onClose();
   };
+
   const handleCancel = () => {
     setPaymentMethod('');
-    setFlag('');
+    setFlag('Repeat');
     setCourierPartner('');
-    onClose();  
+    // onClose();  
   };
 
   return (

@@ -10,19 +10,26 @@ export default function OrdersPage() {
   const [fetchingData, setFetchingData] = useState(false);
   const [updatingData, setUpdatingData] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); 
-  const [filters, setFilters] = useState({ paymentMethod: "", flag: "", courierPartner: "" }); 
+  const [filters, setFilters] = useState({ paymentMethod: "", flag: "Repeat", courierPartner: "" }); 
+  const [formData, setFormData] = useState({
+    fromDate: "",
+    toDate: "",
+  });
 
   useEffect(() => {
     const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`/api/orders`);
-        setOrders(response.data.orders);
-      } catch (error) {
-        console.error("Error fetching orders:", error);
+      if (formData.fromDate && formData.toDate) {
+        try {
+          const response = await axios.get(`/api/orders?from=${formData.fromDate}&to=${formData.toDate}`);
+          console.log("Fetched Orders:", response.data.orders);
+          setOrders(response.data.orders);
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+        }
       }
     };
     fetchOrders();
-  }, []);
+  }, [formData]);
 
   const emailSet = new Set();
   const phoneSet = new Set();
@@ -54,9 +61,10 @@ export default function OrdersPage() {
 
   const filteredOrders = flaggedOrders.filter((order) => {
     const matchesFilters =
-      (filters.paymentMethod ? order.paymentMethod.includes(filters.paymentMethod) : true) &&
-      (filters.flag ? order.flag.includes(filters.flag) : true) &&
-      (filters.courierPartner ? order.shipments && order.shipments[0]?.courier.includes(filters.courierPartner) : true);
+      (filters.paymentMethod ? order.paymentMethod.toLowerCase().includes(filters.paymentMethod.toLowerCase()) : true) &&
+      (filters.flag ? order.flag.toLowerCase().includes(filters.flag.toLowerCase()) : true) &&
+      (filters.courierPartner ? order.shipments && order.shipments[0]?.courier.toLowerCase().includes(filters.courierPartner.toLowerCase()) : true);
+  
 
     return (
       matchesFilters &&
@@ -108,6 +116,25 @@ export default function OrdersPage() {
     }
     setUpdatingData(false);
   };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const response = await axios.get(`/api/orders?from=${formData.fromDate}&to=${formData.toDate}`);
+      setOrders(response.data.orders);  
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+  
 
   const handleApplyFilters = (appliedFilters) => {
     setFilters(appliedFilters);
@@ -115,7 +142,7 @@ export default function OrdersPage() {
 
   return (
     <div className="min-h-screen bg-white text-black p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Order Dashboard</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">MyNachiketa Order Dashboard</h1>
 
       <Link href={"/manifest"}>
         <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">
@@ -153,6 +180,36 @@ export default function OrdersPage() {
           Open Filters
         </button>
       </div>
+      <form onSubmit={handleSubmit} className="space-y-4 my-3">
+        <div className="flex flex-col space-x-4">
+          <label htmlFor="fromDate" className="block text-sm font-medium text-gray-700">
+            From Date
+          </label>
+          <input
+            type="date"
+            id="fromDate"
+            name="fromDate"
+            value={formData.fromDate}
+            onChange={handleChange}
+            className="mt-1  border border-gray-300 rounded-md shadow-sm p-2 text-black"
+          />
+          <label htmlFor="toDate" className="block text-sm font-medium text-gray-700">
+            To Date
+          </label>
+          <input
+            type="date"
+            id="toDate"
+            name="toDate"
+            value={formData.toDate}
+            onChange={handleChange}
+            className="mt-1  border border-gray-300 rounded-md shadow-sm p-2 text-black"
+          />
+        </div>
+
+        <button type="submit" className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          Submit
+        </button>
+      </form>
 
 
       <div className="overflow-x-auto">
