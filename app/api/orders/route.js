@@ -9,8 +9,8 @@ export async function GET(request) {
   const parsedToDate = toDate ? new Date(toDate) : null;
 
   try {
-    console.log('Parsed From Date:', parsedFromDate);
-    console.log('Parsed To Date:', parsedToDate);
+    // console.log('Parsed From Date:', parsedFromDate);
+    // console.log('Parsed To Date:', parsedToDate);
     if (!parsedFromDate || !parsedToDate || isNaN(parsedFromDate) || isNaN(parsedToDate)) {
       return new Response(JSON.stringify({ error: 'Invalid date format' }), {
         status: 400,

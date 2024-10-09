@@ -35,6 +35,7 @@ export default function OrdersPage() {
   const phoneSet = new Set();
   const addressSet = new Set();
 
+  //DeliveredDate - CreatedAt = Time taken in days
   const calculateTimeTaken = (createdAt, deliveredDate) => {
     if (createdAt && deliveredDate) {
       const created = new Date(createdAt);
@@ -46,6 +47,7 @@ export default function OrdersPage() {
     return "N/A";
   };
 
+  // Finding the flagged orders
   const flaggedOrders = orders.map((order) => {
     const isDuplicate =
       emailSet.has(order.customerEmail) &&
@@ -59,13 +61,14 @@ export default function OrdersPage() {
     return { ...order, flag: isDuplicate ? "Repeat" : "New" };
   });
 
+  //Filter orders by applying the filters in modal
   const filteredOrders = flaggedOrders.filter((order) => {
     const matchesFilters =
       (filters.paymentMethod ? order.paymentMethod.toLowerCase().includes(filters.paymentMethod.toLowerCase()) : true) &&
       (filters.flag ? order.flag.toLowerCase().includes(filters.flag.toLowerCase()) : true) &&
       (filters.courierPartner ? order.shipments && order.shipments[0]?.courier.toLowerCase().includes(filters.courierPartner.toLowerCase()) : true);
   
-
+//Search functionality
     return (
       matchesFilters &&
       (order.customerEmail.toLowerCase().includes(searchQuery) ||
@@ -74,6 +77,7 @@ export default function OrdersPage() {
     );
   });
 
+  //Function to fetch and save all the data in the datbase
   const handleFetchData = async () => {
     setFetchingData(true);
     try {
@@ -96,6 +100,7 @@ export default function OrdersPage() {
     setFetchingData(false);
   };
 
+  //Function to refresh the data on button click
   const handleUpdateData = async () => {
     setUpdatingData(true);
     try {
@@ -124,6 +129,7 @@ export default function OrdersPage() {
     });
   };
 
+  //Date filter button submit function
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -144,12 +150,14 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-white text-black p-4">
       <h1 className="text-2xl font-bold mb-4 text-center">MyNachiketa Order Dashboard</h1>
 
-      <Link href={"/manifest"}>
+      {/* <Link href={"/manifest"}>
         <button className="bg-blue-500 text-white font-bold py-2 px-4 rounded mb-4">
           Manifest
         </button>
-      </Link>
+      </Link> */}
 
+
+      {/* SearchBar */}
       <input
         type="text"
         placeholder="Search by Email, Phone, Pincode..."
@@ -157,7 +165,7 @@ export default function OrdersPage() {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value.toLowerCase())}
       />
-
+      {/* Fetch, Update and Filters button */}
       <div className="mb-4">
         <button
           className={`bg-green-500 text-white py-2 px-4 rounded ${fetchingData ? "opacity-50 cursor-not-allowed" : ""}`}
@@ -180,6 +188,8 @@ export default function OrdersPage() {
           Open Filters
         </button>
       </div>
+
+      {/* Date form to input from and to Dates */}
       <form onSubmit={handleSubmit} className="space-y-4 my-3">
         <div className="flex flex-col space-x-4">
           <label htmlFor="fromDate" className="block text-sm font-medium text-gray-700">
@@ -260,7 +270,7 @@ export default function OrdersPage() {
                 <td className="px-3 py-2 text-center">{order.customerCity}</td>
                 <td className="px-3 py-2 text-center">{order.customerState}</td>
                 <td className="px-3 py-2 text-center">{order.customerPincode}</td>
-                <td className={`px-3 py-2 text-center text-black ${order.flag == "Repeat" ? "bg-green-300" : "bg-red-300"}`}>
+                <td className={`px-3 py-2 text-center text-black ${order.flag == "New" ? "bg-green-300" : "bg-red-300"}`}>
                   {order.flag}
                 </td>
               </tr>
