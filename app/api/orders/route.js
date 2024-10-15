@@ -5,8 +5,8 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const fromDate = searchParams.get('from');
   const toDate = searchParams.get('to');
-  const parsedFromDate = fromDate ? new Date(fromDate) : null;
-  const parsedToDate = toDate ? new Date(toDate) : null;
+  const parsedFromDate = fromDate ? new Date(fromDate) : "2022-09-30";
+  const parsedToDate = toDate ? new Date(toDate) : new Date();
 
   try {
     // console.log('Parsed From Date:', parsedFromDate);

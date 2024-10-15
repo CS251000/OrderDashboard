@@ -176,7 +176,7 @@ export default function OrdersPage() {
         </button>
         <button
           className={`bg-yellow-500 text-white py-2 px-4 mx-4 rounded ${updatingData ? "opacity-50 cursor-not-allowed" : ""}`}
-          // onClick={handleUpdateData}
+          onClick={handleUpdateData}
           disabled={updatingData}
         >
           {updatingData ? "Refreshing Data..." : "Refresh Data"}

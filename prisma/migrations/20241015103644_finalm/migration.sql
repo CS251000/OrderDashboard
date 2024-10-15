@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "Order" (
     "sno" SERIAL NOT NULL,
-    "id" INTEGER NOT NULL,
+    "id" TEXT,
     "channelId" INTEGER,
     "channelName" TEXT,
     "baseChannelCode" TEXT,
@@ -41,7 +41,7 @@ CREATE TABLE "Order" (
 
 -- CreateTable
 CREATE TABLE "Product" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "channelOrderProductId" TEXT,
     "name" TEXT,
     "channelSku" TEXT,
@@ -57,7 +57,7 @@ CREATE TABLE "Product" (
 
 -- CreateTable
 CREATE TABLE "Shipment" (
-    "id" INTEGER NOT NULL,
+    "id" SERIAL NOT NULL,
     "isdCode" TEXT,
     "courier" TEXT,
     "weight" DOUBLE PRECISION,
@@ -86,11 +86,23 @@ CREATE TABLE "Activity" (
     CONSTRAINT "Activity_pkey" PRIMARY KEY ("id")
 );
 
--- AddForeignKey
-ALTER TABLE "Product" ADD CONSTRAINT "Product_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE SET NULL ON UPDATE CASCADE;
+-- CreateTable
+CREATE TABLE "User" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- AddForeignKey
-ALTER TABLE "Shipment" ADD CONSTRAINT "Shipment_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Product" ADD CONSTRAINT "Product_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Activity" ADD CONSTRAINT "Activity_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "Shipment" ADD CONSTRAINT "Shipment_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Activity" ADD CONSTRAINT "Activity_orderId_fkey" FOREIGN KEY ("orderId") REFERENCES "Order"("channelOrderId") ON DELETE CASCADE ON UPDATE CASCADE;

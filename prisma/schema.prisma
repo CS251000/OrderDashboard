@@ -4,92 +4,93 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url      = env("DATABASE_URL")
 }
 
-
 model Order {
-  sno               Int       @default(autoincrement())
-  id                Int       
-  channelId         Int?     
-  channelName       String?  
-  baseChannelCode   String?  
-  channelOrderId    String   @id
-  customerName      String?  // Optional string
-  customerEmail     String?  // Optional string
-  customerPhone     String?  // Optional string
+  sno               Int        @default(autoincrement())
+  channelId         Int?
+  channelName       String?
+  baseChannelCode   String?
+  channelOrderId    String     @id
+  customerName      String?
+  customerEmail     String?
+  customerPhone     String?
   customerAddress   String?
   customerAddress2  String?
   customerCity      String?
   customerState     String?
   customerPincode   String?
   customerCountry   String?
-  pickupLocation    String?  // Optional string
-  paymentStatus     String?  // Optional string
-  total             Float?   // Optional float
-  tax               Float?   // Optional float
-  sla               String?  // Optional string
-  shippingMethod    String?  // Optional string
-  expedited         Boolean? // Optional boolean
-  status            String?  // Optional string
-  statusCode        Int?     // Optional integer
-  paymentMethod     String?  // Optional string
-  isInternational   Boolean? // Optional boolean
-  purposeOfShipment Int?     // Optional integer
-  channelCreatedAt  DateTime?// Optional datetime
-  createdAt         DateTime?// Optional datetime
-  allowReturn       Boolean? // Optional boolean
-  isIncomplete      Boolean? // Optional boolean
-  errors            String[]  // Array of errors
-  showEscalationBtn Boolean? 
-  escalationStatus  String?  
-  escalationHistory String[] 
+  pickupLocation    String?
+  paymentStatus     String?
+  total             Float?
+  tax               Float?
+  sla               String?
+  shippingMethod    String?
+  expedited         Boolean?
+  status            String?
+  statusCode        Int?
+  paymentMethod     String?
+  isInternational   Boolean?
+  purposeOfShipment Int?
+  channelCreatedAt  DateTime?
+  createdAt         DateTime?
+  allowReturn       Boolean?
+  isIncomplete      Boolean?
+  errors            String[]
+  showEscalationBtn Boolean?
+  escalationStatus  String?
+  escalationHistory String[]
+  id                Int?
+  activities        Activity[]
   products          Product[]
   shipments         Shipment[]
-  activities        Activity[]
 }
 
 model Product {
-  id                     Int        @id 
-  channelOrderProductId  String? // Optional string
-  name                  String?  // Optional string
-  channelSku            String?  // Optional string
-  quantity              Int?     // Optional integer
-  productId             Int?     // Optional integer
-  available             Int?     // Optional integer
-  status                String?  // Optional string
-  hsn                   String?  // Optional string
-  orderId               String?     // Optional integer
-  order                 Order?   @relation(fields: [orderId], references: [channelOrderId])
+  id                    Int     @id @default(autoincrement())
+  channelOrderProductId String?
+  name                  String?
+  channelSku            String?
+  quantity              Int?
+  productId             Int?
+  available             Int?
+  status                String?
+  hsn                   String?
+  orderId               String?
+  order                 Order?  @relation(fields: [orderId], references: [channelOrderId], onDelete: Cascade)
 }
 
 model Shipment {
-  id                   Int      @id 
-  isdCode              String?  // Optional string
-  courier              String?  // Optional string
-  weight               Float?   // Optional float
-  dimensions           String?  // Optional string
-  pickupScheduledDate  DateTime?// Optional datetime
-  pickupTokenNumber    String?  // Optional string
-  awb                  String?  // Optional string
-  returnAwb            String?  // Optional string
-  volumetricWeight     Float?   // Optional float
-  pod                  String?  // Optional string
-  etd                  String?  // Optional string
-  rtoDeliveredDate     DateTime?// Optional datetime
-  deliveredDate        DateTime?// Optional datetime
-  etdEscalationBtn     Boolean? // Optional boolean
-  orderId              String?     // Optional integer
-  order                Order?   @relation(fields: [orderId], references: [channelOrderId])
+  id                  Int       @id @default(autoincrement())
+  isdCode             String?
+  courier             String?
+  weight              Float?
+  dimensions          String?
+  pickupScheduledDate DateTime?
+  pickupTokenNumber   String?
+  awb                 String?
+  returnAwb           String?
+  volumetricWeight    Float?
+  pod                 String?
+  etd                 String?
+  rtoDeliveredDate    DateTime?
+  deliveredDate       DateTime?
+  etdEscalationBtn    Boolean?
+  orderId             String?
+  order               Order?    @relation(fields: [orderId], references: [channelOrderId], onDelete: Cascade)
 }
 
 model Activity {
-  id        Int      @id @default(autoincrement())
-  action    String?  // Optional string
-  orderId   String?     // Optional integer
-  order     Order?   @relation(fields: [orderId], references: [channelOrderId])
+  id      Int     @id @default(autoincrement())
+  action  String?
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [channelOrderId], onDelete: Cascade)
 }
 
-
-
+model User {
+  id    Int    @id @default(autoincrement())
+  name  String
+  email String @unique
+}

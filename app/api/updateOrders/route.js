@@ -9,7 +9,7 @@ export async function POST(req) {
     let totalPages = 1;
 
     while (currentPage <= totalPages) {
-      const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders?page=${currentPage}&per_page=50`, {
+      const response = await axios.get(`https://apiv2.shiprocket.in/v1/external/orders?page=${currentPage}&per_page=100`, {
         headers: {
           'Authorization': `Bearer ${process.env.SHIPROCKET_API_TOKEN}`,
           'Content-Type': 'application/json',
@@ -27,7 +27,7 @@ export async function POST(req) {
       }
 
       for (const order of orders) {
-        const existingOrder = await prisma.product.findFirst({
+        const existingOrder = await prisma.order.findFirst({
           where: {
             channelOrderId: order.channel_order_id || '',
           },
