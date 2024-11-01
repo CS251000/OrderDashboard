@@ -2,7 +2,7 @@
     "crons": [
       {
         "path": "/api/txtlocalcron",
-        "schedule": "* * * * *"
+        "schedule": "0 10 * * 0"
       }
     ]
   }
