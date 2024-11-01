@@ -5,7 +5,7 @@ import { NextResponse } from 'next/server';
 
 export async function GET(req) {
   const apiKey = process.env.TXT_API_KEY;
-  numbers="9818907290";
+  const numbers="9818907290";
   const sender = "MYNACH";
   const message = "Hello Parents, Sunday Gita Class - 3 (Doing Work, Without Desire) Starts in 1 Hour on Zoom by myNachiketa.com. Meeting Link: https://bit.ly/4bTqSux";
 
